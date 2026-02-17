@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HebrewPhunics – Learn Hebrew with Joy</title>
+
+  <!-- PWA manifest -->
+  <link rel="manifest" href="data:application/manifest+json,{
+    &quot;name&quot;: &quot;HebrewPhunics&quot;,
+    &quot;short_name&quot;: &quot;Phunics&quot;,
+    &quot;start_url&quot;: &quot;./&quot;,
+    &quot;display&quot;: &quot;standalone&quot;,
+    &quot;background_color&quot;: &quot;#003087&quot;,
+    &quot;theme_color&quot;: &quot;#40C4FF&quot;,
+    &quot;icons&quot;: [
+      {
+        &quot;src&quot;: &quot;https://via.placeholder.com/192/003087/FFFFFF?text=HP&quot;,
+        &quot;sizes&quot;: &quot;192x192&quot;,
+        &quot;type&quot;: &quot;image/png&quot;
+      }
+    ]
+  }">
+
+  <meta name="theme-color" content="#003087" />
+
+  <link href="https://fonts.googleapis.com/css2?family=Assistant:wght@400;600;700&family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --israeli-blue: #003087;
+      --sky-blue: #40C4FF;
+      --gold: #F9A825;
+      --coral: #FF6F61;
+      --mint: #64DD17;
+      --white: #ffffff;
+      --light-bg: #f8f9fa;
+    }
+
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #e3f2fd, #f3e5f5, #fff9c4);
+      min-height: 100vh;
+      color: #333;
+    }
+
+    .container { max-width: 1200px; margin: 0 auto; padding: 16px; }
+
+    header {
+      background: var(--israeli-blue);
+      color: white;
+      padding: 16px;
+      text-align: center;
+      border-radius: 0 0 16px 16px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    }
+
+    h1 { margin: 0; font-size: 2rem; }
+    nav {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      justify-content: center;
+      margin: 16px 0;
+    }
+    nav button {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 999px;
+      background: var(--sky-blue);
+      color: white;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    nav button.active { background: var(--gold); color: black; }
+
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+
+    /* Aleph mascot */
+    .aleph-mascot {
+      width: 90px; height: 120px; position: relative; display: inline-block;
+      animation: float 6s ease-in-out infinite;
+    }
+    .mascot-head {
+      width: 70px; height: 70px; background: white;
+      border-radius: 50%; position: absolute; top: 0; left: 10px;
+      box-shadow: inset 0 -8px 15px rgba(0,0,0,0.1);
+    }
+    .mascot-eye {
+      width: 14px; height: 18px; background: #0d1b4c;
+      border-radius: 50%; position: absolute; top: 22px; animation: blink 5s infinite;
+    }
+    .mascot-eye-left { left: 18px; }
+    .mascot-eye-right { right: 18px; }
+    .mascot-pupil { width: 6px; height: 10px; background: white; border-radius: 50%; position: absolute; top: 4px; left: 4px; }
+    .mascot-smile { width: 40px; height: 20px; border-bottom: 5px solid #0d1b4c; border-radius: 0 0 50px 50px; position: absolute; top: 45px; left: 15px; }
+    .mascot-kippah {
+      width: 50px; height: 24px; background: linear-gradient(var(--gold), #d4a017);
+      border-radius: 50% 50% 0 0; position: absolute; top: -10px; left: 20px;
+    }
+    .mascot-body {
+      width: 60px; height: 70px; background: linear-gradient(var(--sky-blue), var(--israeli-blue));
+      border-radius: 50% 50% 40% 40%; position: absolute; top: 50px; left: 15px;
+    }
+    @keyframes float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-12px); } }
+    @keyframes blink { 0%,90%,100% { transform: scaleY(1); } 92%,98% { transform: scaleY(0.1); } }
+
+    .modal, .popover {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,0.6); z-index: 1000;
+      align-items: center; justify-content: center;
+    }
+    .modal.active, .popover.active { display: flex; }
+    .modal-content, .popover-content {
+      background: white; padding: 24px; border-radius: 16px;
+      max-width: 90%; max-height: 85vh; overflow-y: auto;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+      position: relative;
+    }
+    .close { position: absolute; top: 12px; right: 16px; font-size: 32px; cursor: pointer; }
+
+    .card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 16px; margin: 20px 0; }
+    .card {
+      background: white; border-radius: 12px; overflow: hidden;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1); cursor: pointer;
+    }
+    .card img { width: 100%; height: 120px; object-fit: cover; }
+    .card-body { padding: 12px; text-align: center; }
+
+    .root-highlight { background: rgba(249,168,37,0.3); border-bottom: 2px solid var(--gold); cursor: pointer; }
+
+    @media (max-width: 600px) {
+      .aleph-mascot { width: 70px; height: 95px; }
+      nav button { padding: 8px 14px; font-size: 0.9rem; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="aleph-mascot">
+    <div class="mascot-kippah"></div>
+    <div class="mascot-head">
+      <div class="mascot-eye mascot-eye-left"><div class="mascot-pupil"></div></div>
+      <div class="mascot-eye mascot-eye-right"><div class="mascot-pupil"></div></div>
+      <div class="mascot-smile"></div>
+    </div>
+    <div class="mascot-body"></div>
+  </div>
+  <h1>HebrewPhunics</h1>
+</header>
+
+<main class="container">
+  <nav>
+    <button data-tab="home" class="active">Home</button>
+    <button data-tab="alphabet">Alphabet</button>
+    <button data-tab="vocab">Vocabulary</button>
+    <button data-tab="immersion">Immersion</button>
+    <button data-tab="convo">Convo AI</button>
+    <button data-tab="chat">AI Chat</button>
+  </nav>
+
+  <!-- Home -->
+  <div id="home" class="tab-content active">
+    <h2>Welcome!</h2>
+    <p>Learn Hebrew with joy. Tap tabs above to start.</p>
+  </div>
+
+  <!-- Alphabet -->
+  <div id="alphabet" class="tab-content">
+    <h2>Hebrew Alphabet</h2>
+    <div class="card-grid" id="letter-grid"></div>
+  </div>
+
+  <!-- Vocabulary -->
+  <div id="vocab" class="tab-content">
+    <h2>Vocabulary</h2>
+    <div id="vocab-categories"></div>
+  </div>
+
+  <!-- Immersion -->
+  <div id="immersion" class="tab-content">
+    <h2>Immersion</h2>
+    <div>
+      <input id="yt-search" placeholder="Search YouTube (Hebrew songs, Israel, shows)" style="width:100%; padding:12px; margin:12px 0; border-radius:8px; border:1px solid #ccc;" />
+      <button onclick="searchYouTube()">Search</button>
+    </div>
+    <div id="yt-results" class="card-grid"></div>
+
+    <h3>Short Stories</h3>
+    <div id="stories-list" class="card-grid"></div>
+  </div>
+
+  <!-- Convo AI -->
+  <div id="convo" class="tab-content">
+    <h2>Convo Simulator</h2>
+    <input id="convo-input" placeholder="Type a scenario..." style="width:100%; padding:12px; margin:12px 0;" />
+    <button onclick="startConvo()">Start</button>
+    <div id="convo-output" style="margin-top:20px; white-space:pre-wrap;"></div>
+  </div>
+
+  <!-- AI Chat -->
+  <div id="chat" class="tab-content">
+    <h2>AI Chat Practice</h2>
+    <input id="chat-input" placeholder="Say something in Hebrew or English..." style="width:100%; padding:12px; margin:12px 0;" />
+    <button onclick="sendChat()">Send</button>
+    <div id="chat-output" style="margin-top:20px; white-space:pre-wrap;"></div>
+  </div>
+</main>
+
+<!-- Modals -->
+<div id="letter-modal" class="modal">
+  <div class="modal-content">
+    <span class="close" onclick="closeModal('letter-modal')">&times;</span>
+    <div id="modal-content"></div>
+  </div>
+</div>
+
+<div id="root-popover" class="popover">
+  <div class="popover-content" id="popover-content"></div>
+</div>
+
+<script>
+// ──────────────────────────────────────────────
+// Tab switching
+// ──────────────────────────────────────────────
+document.querySelectorAll('nav button').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+    document.getElementById(btn.dataset.tab).classList.add('active');
+    btn.classList.add('active');
+  });
+});
+
+// ──────────────────────────────────────────────
+// Alphabet
+// ──────────────────────────────────────────────
+const letters = [
+  {char:'א', name:'Aleph', sound:'silent or glottal stop'},
+  {char:'ב', name:'Bet', sound:'b / v'},
+  {char:'ג', name:'Gimel', sound:'g'},
+  // ... add all 22 letters here (shortened for example)
+];
+
+function renderAlphabet() {
+  const grid = document.getElementById('letter-grid');
+  grid.innerHTML = letters.map(l => `
+    <div class="card" onclick="showLetter('${l.char}', '${l.name}', '${l.sound}')">
+      <div style="font-size:4rem; font-family:'Assistant'; text-align:center; padding:20px;">${l.char}</div>
+      <div class="card-body">
+        <strong>${l.name}</strong><br>${l.sound}
+      </div>
+    </div>
+  `).join('');
+}
+
+function showLetter(char, name, sound) {
+  const modal = document.getElementById('modal-content');
+  modal.innerHTML = `
+    <h2 style="font-size:6rem; text-align:center; font-family:'Assistant';">${char}</h2>
+    <p style="text-align:center; font-size:1.5rem;">${name} – ${sound}</p>
+    <button onclick="speak('${name}')" style="display:block; margin:20px auto; padding:12px 24px; background:var(--sky-blue); color:white; border:none; border-radius:999px; font-size:1.2rem;">Hear sound</button>
+    <p>Click any root below to see related words:</p>
+    <p><span class="root-highlight" onclick="showRoot('א-ב')">א-ב</span> – father/mother related</p>
+  `;
+  document.getElementById('letter-modal').classList.add('active');
+}
+
+// ──────────────────────────────────────────────
+// Speech
+// ──────────────────────────────────────────────
+function speak(text) {
+  if ('speechSynthesis' in window) {
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang = 'he-IL';
+    speechSynthesis.speak(u);
+  } else {
+    alert('Your browser does not support Hebrew speech.');
+  }
+}
+
+// ──────────────────────────────────────────────
+// Root popover example
+// ──────────────────────────────────────────────
+function showRoot(root) {
+  const content = document.getElementById('popover-content');
+  content.innerHTML = `
+    <h3>Root: ${root}</h3>
+    <p>Related words:</p>
+    <ul>
+      <li>אבא – father <img src="https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=80" alt="father" style="vertical-align:middle; border-radius:4px;"></li>
+      <li>אמא – mother <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=80" alt="mother" style="vertical-align:middle; border-radius:4px;"></li>
+      <!-- more examples -->
+    </ul>
+    <button onclick="closePopover()" style="margin-top:16px; padding:8px 16px; background:var(--coral); color:white; border:none; border-radius:8px;">Close</button>
+  `;
+  document.getElementById('root-popover').classList.add('active');
+}
+
+function closePopover() {
+  document.getElementById('root-popover').classList.remove('active');
+}
+
+// ──────────────────────────────────────────────
+// YouTube search
+// ──────────────────────────────────────────────
+const YT_API_KEY = 'YOUR_YOUTUBE_API_KEY_HERE'; // ← replace
+
+async function searchYouTube() {
+  const q = document.getElementById('yt-search').value.trim() || 'hebrew songs israel short';
+  if (!YT_API_KEY || YT_API_KEY === 'YOUR_YOUTUBE_API_KEY_HERE') {
+    alert('Please add your YouTube API key in the code.');
+    return;
+  }
+  try {
+    const res = await fetch(`https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(q)}&type=video&maxResults=12&key=${YT_API_KEY}`);
+    const data = await res.json();
+    const grid = document.getElementById('yt-results');
+    grid.innerHTML = data.items.map(item => {
+      const id = item.id.videoId;
+      const title = item.snippet.title;
+      const thumb = item.snippet.thumbnails.medium.url;
+      return `
+        <div class="card" onclick="playVideo('${id}')">
+          <img src="${thumb}" alt="${title}">
+          <div class="card-body">${title}</div>
+        </div>
+      `;
+    }).join('');
+  } catch (e) {
+    alert('YouTube search failed. Check API key or internet.');
+  }
+}
+
+function playVideo(id) {
+  const w = window.open(`https://www.youtube.com/watch?v=${id}`, '_blank');
+  if (!w) alert('Please allow popups for YouTube.');
+}
+
+// ──────────────────────────────────────────────
+// Placeholder stories
+// ──────────────────────────────────────────────
+const stories = [
+  {title:"הילד הקטן", text:"פעם היה ילד קטן. הוא אהב לרוץ בגינה... (add full text here)"},
+  {title:"החתול והעכבר", text:"חתול רעב רצה לתפוס עכבר..."},
+  // add many more
+];
+
+function renderStories() {
+  const list = document.getElementById('stories-list');
+  list.innerHTML = stories.map(s => `
+    <div class="card">
+      <div class="card-body">
+        <strong>${s.title}</strong>
+        <p style="font-size:0.9rem; color:#666;">Short story for beginners</p>
+        <button onclick="alert('Story: ${s.text.slice(0,100)}...')">Read</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+// ──────────────────────────────────────────────
+// Convo & Chat placeholders
+// ──────────────────────────────────────────────
+function startConvo() {
+  const input = document.getElementById('convo-input').value.trim();
+  if (!input) return;
+  document.getElementById('convo-output').innerHTML += `<p><strong>You:</strong> ${input}</p><p><strong>AI:</strong> שלום! איך אני יכול לעזור לך היום?</p>`;
+}
+
+function sendChat() {
+  const input = document.getElementById('chat-input').value.trim();
+  if (!input) return;
+  document.getElementById('chat-output').innerHTML += `<p><strong>You:</strong> ${input}</p><p><strong>AI:</strong> תודה על ההודעה! מה את רוצה לתרגל?</p>`;
+  document.getElementById('chat-input').value = '';
+}
+
+// ──────────────────────────────────────────────
+// Service Worker – basic offline support
+// ──────────────────────────────────────────────
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register(new URL('./sw.js', import.meta.url), {type: 'module'})
+      .then(reg => console.log('Service Worker registered'))
+      .catch(err => console.log('Service Worker failed:', err));
+  });
+}
+
+// Init
+renderAlphabet();
+renderStories();
+</script>
+
+<!-- Create sw.js in same folder with this content -->
+<script type="module">
+  // sw.js content (save as separate file or inline if allowed by host)
+  self.addEventListener('install', e => {
+    e.waitUntil(
+      caches.open('hebrewphunics-v1').then(cache => {
+        return cache.addAll(['./index.html']);
+      })
+    );
+  });
+
+  self.addEventListener('fetch', e => {
+    e.respondWith(
+      caches.match(e.request).then(resp => {
+        return resp || fetch(e.request);
+      })
+    );
+  });
+</script>
+
+</body>
+</html>
