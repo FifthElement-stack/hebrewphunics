@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HebrewPhunics – Learn Hebrew with Joy</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; padding: 0; background: #fffaf0; color: #333; }
+        header { text-align: center; padding: 30px 20px; background: linear-gradient(to bottom, #fffaf0, #f4e4bc); }
+        h1 { margin: 0; font-size: 2.8em; color: #8b4513; }
+        .welcome { font-size: 1.3em; color: #555; margin: 10px 0; }
+        nav { display: flex; justify-content: center; flex-wrap: wrap; padding: 20px; background: #deb887; }
+        .tab-button { background: #cd853f; border: none; padding: 12px 24px; margin: 8px; font-size: 1.1em; color: white; cursor: pointer; border-radius: 8px; transition: background 0.3s; }
+        .tab-button:hover { background: #a0522d; }
+        .tab-button.active { background: #8b4513; }
+        .tab-content { display: none; padding: 30px; max-width: 900px; margin: 0 auto; }
+        .tab-content.active { display: block; }
+        .letter { font-size: 90px; margin: 20px; cursor: pointer; display: inline-block; border: 3px solid #ccc; border-radius: 12px; padding: 15px; background: white; transition: all 0.2s; }
+        .letter:hover { background: #ffd700; transform: scale(1.1); }
+        button.action { padding: 12px 30px; font-size: 1.2em; background: #2e8b57; color: white; border: none; border-radius: 6px; cursor: pointer; margin: 10px 0; }
+        button.action:hover { background: #228b22; }
+        #chat-output { margin-top: 15px; border: 1px solid #ccc; padding: 15px; min-height: 150px; background: white; border-radius: 8px; overflow-y: auto; }
+        input[type="text"] { padding: 12px; font-size: 1.1em; width: 70%; max-width: 500px; border: 1px solid #ccc; border-radius: 6px; }
+
+        /* Winking Aleph Mascot */
+        .mascot-container { position: relative; display: inline-block; margin: 20px auto; }
+        .aleph-base { font-size: 180px; color: #cd853f; text-shadow: 4px 4px 10px rgba(0,0,0,0.25); animation: float 6s ease-in-out infinite; }
+        .wink-eye { position: absolute; top: 65px; left: 85px; width: 45px; height: 22px; background: #8b4513; border-radius: 50% 50% 25% 25%; animation: wink 5s infinite ease-in-out; }
+        .eye-highlight { position: absolute; top: 72px; left: 100px; width: 12px; height: 12px; background: white; border-radius: 50%; opacity: 0.7; }
+
+        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-20px); } }
+        @keyframes wink { 0%, 88%, 100% { height: 22px; } 90% { height: 3px; } 92% { height: 22px; } }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>HebrewPhunics</h1>
+        <p class="welcome">Learn Hebrew with Joy! Tap the tabs below to start.</p>
+        <div class="mascot-container">
+            <div class="aleph-base">א</div>
+            <div class="wink-eye"></div>
+            <div class="eye-highlight"></div>
+        </div>
+    </header>
+
+    <nav>
+        <button class="tab-button active" onclick="openTab('alphabet')">Hebrew Alphabet</button>
+        <button class="tab-button" onclick="openTab('vocab')">Vocabulary</button>
+        <button class="tab-button" onclick="openTab('immersion')">Immersion</button>
+        <button class="tab-button" onclick="openTab('stories')">Short Stories</button>
+        <button class="tab-button" onclick="openTab('convo')">Convo Simulator</button>
+        <button class="tab-button" onclick="openTab('chat')">AI Chat Practice</button>
+    </nav>
+
+    <div id="alphabet" class="tab-content active">
+        <h2>Hebrew Alphabet</h2>
+        <p>Click each letter to practice its sound (audio coming soon!)</p>
+        <div style="text-align: center;">
+            <span class="letter" onclick="alert('Aleph! א – like a silent carrier or glottal stop')">א</span>
+            <span class="letter" onclick="alert('Bet! ב – b or v sound')">ב</span>
+            <span class="letter" onclick="alert('Gimel! ג – g sound')">ג</span>
+            <!-- Add more letters as you like -->
+        </div>
+    </div>
+
+    <div id="vocab" class="tab-content">
+        <h2>Vocabulary</h2>
+        <p>Basic words and flashcards coming soon.</p>
+    </div>
+
+    <div id="immersion" class="tab-content">
+        <h2>Immersion</h2>
+        <p>Everyday Hebrew practice (in progress).</p>
+    </div>
+
+    <div id="stories" class="tab-content">
+        <h2>Short Stories</h2>
+        <p>Simple stories with translations (coming).</p>
+    </div>
+
+    <div id="convo" class="tab-content">
+        <h2>Convo Simulator</h2>
+        <button class="action" onclick="alert('Starting conversation practice!')">Start</button>
+        <p>Practice dialogues here.</p>
+    </div>
+
+    <div id="chat" class="tab-content">
+        <h2>AI Chat Practice</h2>
+        <input type="text" id="chat-input" placeholder="Type your Hebrew message...">
+        <button class="action" onclick="sendChat()">Send</button>
+        <div id="chat-output"></div>
+    </div>
+
+    <script>
+        function openTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            document.getElementById(tabName).classList.add('active');
+            document.querySelectorAll('.tab-button').forEach(b => b.classList.remove('active'));
+            event.currentTarget.classList.add('active');
+        }
+
+        function sendChat() {
+            const input = document.getElementById('chat-input');
+            const output = document.getElementById('chat-output');
+            if (input.value.trim()) {
+                output.innerHTML += `<p><strong>You:</strong> ${input.value}</p>`;
+                output.innerHTML += `<p><strong>Aleph (simulated):</strong> כל הכבוד! Great job. 😊 What next?</p>`;
+                input.value = '';
+                output.scrollTop = output.scrollHeight;
+            }
+        }
+    </script>
+</body>
+</html>
