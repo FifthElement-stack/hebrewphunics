@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HebrewPhunics – Learn Hebrew with Joy</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: #fffaf0;
+            color: #333;
+        }
+        header {
+            text-align: center;
+            padding: 30px 20px;
+            background: linear-gradient(to bottom, #fffaf0, #f4e4bc);
+        }
+        h1 {
+            margin: 0;
+            font-size: 2.8em;
+            color: #8b4513;
+        }
+        .welcome {
+            font-size: 1.3em;
+            color: #555;
+            margin: 10px 0;
+        }
+        nav {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            padding: 20px;
+            background: #deb887;
+        }
+        .tab-button {
+            background: #cd853f;
+            border: none;
+            padding: 12px 24px;
+            margin: 8px;
+            font-size: 1.1em;
+            color: white;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: background 0.3s;
+        }
+        .tab-button:hover {
+            background: #a0522d;
+        }
+        .tab-button.active {
+            background: #8b4513;
+        }
+        .tab-content {
+            display: none;
+            padding: 30px;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        .letter {
+            font-size: 90px;
+            margin: 20px;
+            cursor: pointer;
+            display: inline-block;
+            border: 3px solid #ccc;
+            border-radius: 12px;
+            padding: 15px;
+            background: white;
+            transition: all 0.2s;
+        }
+        .letter:hover {
+            background: #ffd700;
+            transform: scale(1.1);
+        }
+        button.action {
+            padding: 12px 30px;
+            font-size: 1.2em;
+            background: #2e8b57;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            margin: 10px 0;
+        }
+        button.action:hover {
+            background: #228b22;
+        }
+        #chat-output {
