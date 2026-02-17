@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HebrewPhunics – Learn Hebrew with Joy</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --israeli-blue: #0077B6;
+            --sky-blue: #48CAE4;
+            --energetic-orange: #F4A261;
+            --celebration-gold: #FFD60A;
+            --playful-pink: #FF006E;
+            --success-green: #06FFA5;
+            --gentle-red: #EF476F;
+            --white: #FFFFFF;
+            --dark-bg: #001219;
+            --sidebar-width: 80px;
+            --sidebar-expanded: 240px;
+        }
+
+        body {
+            font-family: 'Nunito Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #E3F2FD 0%, #F3E5F5 50%, #FFF9C4 100%);
+            min-height: 100vh;
+            color: #333;
+            overflow-x: hidden;
+        }
+
+        .app-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        * {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Moving Aleph Mascot */
+        .mascot-container {
+            position: relative;
+            width: 120px;
+            height: 140px;
+            animation: mascotFloat 6s ease-in-out infinite;
+        }
+
+        .aleph-base {
+            font-size: 180px;
+            color: #cd853f;
+            text-shadow: 4px 4px 10px rgba(0,0,0,0.25);
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes mascotFloat {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+
+        .mascot-container:hover {
+            animation-play-state: paused;
+            transform: scale(1.1);
+        }
+
+        /* Sidebar Navigation with Font Awesome icons */
+        .sidebar {
+            width: var(--sidebar-width);
+            background: linear-gradient(180deg, var(--israeli-blue) 0%, #005F8F 100%);
+            position: fixed;
+            left: 0;
+            top: 0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px 0;
+            box-shadow: 4px 0 20px rgba(0,0,0,0.1);
+            z-index: 1000;
+            overflow: hidden;
+        }
+
+        .sidebar:hover {
+            width: var(--sidebar-expanded);
+        }
+
+        .sidebar-logo {
+            margin-bottom: 30px;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .sidebar-nav {
+            flex: 1;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            padding: 0 10px;
+        }
+
+        .nav-item {
+            width: 100%;
+            padding: 15px;
+            background: rgba(255,255,255,0.1);
+            border: none;
+            border-radius: 15px;
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            position: relative;
+            overflow: visible;
+        }
+
+        .nav-item:hover {
+            background: rgba(255,255,255,0.2);
+            transform: translateX(5px);
+        }
+
+        .nav-item.active {
+            background: linear-gradient(90deg, var(--energetic-orange), var(--playful-pink));
+            box-shadow: 0 4px 15px rgba(244, 162, 97, 0.4);
+        }
+
+        .nav-icon {
+            font-size: 24px;
+            min-width: 24px;
+            text-align: center;
+        }
+
+        .nav-label {
+            font-size: 16px;
+            font-weight: 600;
+            white-space: nowrap;
+            opacity: 0;
+            width: 0;
+            overflow: hidden;
+        }
+
+        .sidebar:hover .nav-label {
+            opacity: 1;
+            width: auto;
+        }
+
+        .nav-item::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            left: 70px;
+            background: rgba(0,0,0,0.9);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 14px;
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            z-index: 10000;
+        }
+
+        .nav-item:hover::after {
+            opacity: 1;
+            left: 80px;
+        }
+
+        .sidebar:hover .nav-item::after {
+            opacity: 0;
+        }
+
+        .sidebar-streak {
+            background: rgba(255,255,255,0.15);
+            padding: 15px;
+            border-radius: 15px;
+            text-align: center;
+            color: white;
+            margin: 20px 10px;
+            backdrop-filter: blur(10px);
+        }
+
+        .streak-flame {
+            font-size: 32px;
+            margin-bottom: 5px;
+            animation: flicker 1.5s infinite;
+        }
+
+        .streak-number {
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .streak-text {
+            font-size: 12px;
+            opacity: 0;
+            height: 0;
+            overflow: hidden;
+        }
+
+        .sidebar:hover .streak-text {
+            opacity: 0.9;
+            height: auto;
+            margin-top: 5px;
+        }
+
+        .main-content {
+            margin-left: var(--sidebar-width);
+            flex: 1;
+            padding: 30px;
+            min-height: 100vh;
+        }
+
+        .header {
+            background: linear-gradient(135deg, var(--israeli-blue), var(--sky-blue));
+            color: white;
+            padding: 30px 40px;
+            border-radius: 25px;
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 10px 40px rgba(0,119,182,0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -10%;
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            border-radius: 50%;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .header-title h1 {
+            font-size: 32px;
+            margin-bottom: 5px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .header-title p {
+            font-size: 16px;
+            opacity: 0.95;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .xp-badge {
+            background: rgba(255,255,255,0.25);
+            padding: 12px 20px;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            text-align: center;
+        }
+
+        .xp-badge-label {
+            font-size: 12px;
+            opacity: 0.9;
+            margin-bottom: 5px;
+        }
+
+        .xp-badge-value {
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeInUp 0.5s ease-out;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .content-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 25px;
+        }
+
+        .content-card {
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .content-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+        }
+
+        .content-thumbnail {
+            width: 100%;
+            height: 180px;
+            background: linear-gradient(135deg, var(--sky-blue), var(--israeli-blue));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 64px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .content-thumbnail::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.2) 0%, transparent 70%);
+            animation: shimmer 3s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .content-info {
+            padding: 20px;
+        }
+
+        .content-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: var(--israeli-blue);
+        }
+
+        .content-meta {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 12px;
+        }
+
+        .difficulty-badge {
+            display: inline-block;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .btn {
+            padding: 14px 28px;
+            font-size: 16px;
+            font-weight: 600;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.3);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .btn:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+        }
+
+        .btn:active {
+            transform: translateY(0px);
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, var(--israeli-blue), var(--sky-blue));
+            color: white;
+            padding: 25px;
+            border-radius: 20px;
+            text-align: center;
+            box-shadow: 0 8px 25px rgba(0,119,182,0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+        }
+
+        .stat-card h3 {
+            font-size: 16px;
+            margin-bottom: 12px;
+            opacity: 0.95;
+            position: relative;
+            z-index: 1;
+        }
+
+        .stat-value {
+            font-size: 48px;
+            font-weight: bold;
+            position: relative;
+            z-index: 1;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .section-title {
+            color: var(--israeli-blue);
+            font-size: 32px;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            font-weight: 700;
+        }
+
+        @keyframes confetti-fall {
+            to {
+                transform: translateY(100vh) rotate(720deg);
+                opacity: 0;
+            }
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid rgba(0,119,182,0.2);
+            border-top: 5px solid var(--israeli-blue);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 60px;
+            }
+
+            .sidebar:hover {
+                width: 200px;
+            }
+
+            .main-content {
+                margin-left: 60px;
+                padding: 15px;
+            }
+
+            .header {
+                padding: 20px;
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .header-aleph {
+                width: 50px;
+                height: 50px;
+                font-size: 35px;
+            }
+
+            .content-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .daily-challenge {
+            background: linear-gradient(135deg, var(--playful-pink), var(--energetic-orange));
+            color: white;
+            padding: 30px;
+            border-radius: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+        }
+
+        .challenge-title {
+            font-size: 24px;
+            margin-bottom: 15px;
+        }
+
+        .challenge-description {
+            font-size: 16px;
+            margin-bottom: 20px;
+            opacity: 0.9;
+        }
+
+        .audio-player {
+            background: #f0f0f0;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .play-button {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: var(--israeli-blue);
+            color: white;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .play-button:hover {
+            background: var(--energetic-orange);
+            transform: scale(1.1);
+        }
+
+        .lyrics-overlay {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.7) 50%, transparent 100%);
+            padding: 40px 20px 20px 20px;
+            z-index: 9999;
+            display: none;
+            animation: slideUpLyrics 0.5s ease-out;
+        }
+
+        @keyframes slideUpLyrics {
+            from { transform: translateY(100%); }
+            to { transform: translateY(0); }
+        }
+
+        .lyrics-overlay.active {
+            display: block;
+        }
+
+        .overlay-lyric-line {
+            text-align: center;
+            margin-bottom: 15px;
+            transition: all 0.3s;
+            opacity: 0.5;
+        }
+
+        .overlay-lyric-line.current {
+            opacity: 1;
+            transform: scale(1.2);
+        }
+
+        .overlay-hebrew {
+            font-size: 28px;
+            font-weight: bold;
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+            margin-bottom: 5px;
+        }
+
+        .overlay-translit {
+            font-size: 18px;
+            color: var(--celebration-gold);
+            font-style: italic;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.8);
+        }
+
+        .lyrics-controls {
+            position: fixed;
+            top: 120px;
+            right: 20px;
+            z-index: 10000;
+            display: none;
+        }
+
+        .lyrics-controls.active {
+            display: block;
+        }
+
+        .lyrics-toggle-btn {
+            background: var(--israeli-blue);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 25px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            transition: all 0.3s;
+        }
+
+        .lyrics-toggle-btn:hover {
+            transform: scale(1.05);
+            background: var(--energetic-orange);
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <div class="sidebar">
+            <div class="sidebar-logo" onclick="switchTab('home')">
+                <div class="mascot-container">
+                    <div class="aleph-base">א</div>
+                </div>
+            </div>
+
+            <div class="sidebar-nav">
+                <button class="nav-item active" data-tooltip="Home Dashboard" onclick="switchTab('home')">
+                    <span class="nav-icon"><i class="fa-solid fa-house"></i></span>
+                    <span class="nav-label">Home</span>
+                </button>
+                <button class="nav-item" data-tooltip="Learn Alphabet" onclick="switchTab('alphabet')">
+                    <span class="nav-icon"><i class="fa-solid fa-spell-check"></i></span>
+                    <span class="nav-label">Alphabet</span>
+                </button>
+                <button class="nav-item" data-tooltip="Vocabulary Games" onclick="switchTab('vocabulary')">
+                    <span class="nav-icon"><i class="fa-solid fa-book-open"></i></span>
+                    <span class="nav-label">Vocabulary</span>
+                </button>
+                <button class="nav-item" data-tooltip="Grammar Lessons" onclick="switchTab('grammar')">
+                    <span class="nav-icon"><i class="fa-solid fa-graduation-cap"></i></span>
+                    <span class="nav-label">Grammar</span>
+                </button>
+                <button class="nav-item" data-tooltip="Video Immersion" onclick="switchTab('immersion')">
+                    <span class="nav-icon"><i class="fa-solid fa-video"></i></span>
+                    <span class="nav-label">Immersion</span>
+                </button>
+                <button class="nav-item" data-tooltip="Hebrew Karaoke" onclick="switchTab('karaoke')">
+                    <span class="nav-icon"><i class="fa-solid fa-microphone-lines"></i></span>
+                    <span class="nav-label">Karaoke</span>
+                </button>
+                <button class="nav-item" data-tooltip="Pronunciation Practice" onclick="switchTab('speaking')">
+                    <span class="nav-icon"><i class="fa-solid fa-volume-high"></i></span>
+                    <span class="nav-label">Speaking</span>
+                </button>
+                <button class="nav-item" data-tooltip="Reading Practice" onclick="switchTab('reading')">
+                    <span class="nav-icon"><i class="fa-solid fa-book"></i></span>
+                    <span class="nav-label">Reading</span>
+                </button>
+                <button class="nav-item" data-tooltip="AI Conversations" onclick="switchTab('chat')">
+                    <span class="nav-icon"><i class="fa-solid fa-robot"></i></span>
+                    <span class="nav-label">AI Chat</span>
+                </button>
+                <button class="nav-item" data-tooltip="Your Profile" onclick="switchTab('profile')">
+                    <span class="nav-icon"><i class="fa-solid fa-user-circle"></i></span>
+                    <span class="nav-label">Profile</span>
+                </button>
+            </div>
+
+            <div class="sidebar-streak">
+                <div class="streak-flame">🔥</div>
+                <div class="streak-number" id="sidebar-streak">7</div>
+                <div class="streak-text">Day Streak</div>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="header">
+                <div class="header-left">
+                    <div class="mascot-container">
+                        <div class="aleph-base">א</div>
+                    </div>
+                    <div class="header-title">
+                        <h1>Hebrew<span style="color: var(--energetic-orange);">Phunics</span></h1>
+                        <p>Master Hebrew with Joy & Phonics! 🎉</p>
+                    </div>
+                </div>
+                <div class="header-right">
+                    <div class="xp-badge">
+                        <div class="xp-badge-label">Total XP</div>
+                        <div class="xp-badge-value" id="header-xp">350</div>
+                    </div>
+                    <div class="xp-badge">
+                        <div class="xp-badge-label">Words Learned</div>
+                        <div class="xp-badge-value" id="header-words">47</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="content-area">
+                <!-- Tabs content as before -->
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="content-modal">
+        <div class="modal-content">
+            <button class="close-modal" onclick="closeModal()">×</button>
+            <div id="modal-body">
+                <!-- Content will be inserted here -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // JS as before, no changes needed for icons since they're now Font Awesome
+    </script>
+</body>
+</html>
